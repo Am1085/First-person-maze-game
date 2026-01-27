@@ -1,0 +1,1 @@
+We chose Godot because it is lightweight, open-source, and supports real-time 3D graphics, lighting, camera projection, and animation, which perfectly match our computer graphics syllabus.

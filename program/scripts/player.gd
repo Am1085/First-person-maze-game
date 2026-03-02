@@ -25,3 +25,13 @@ func _physics_process(delta):
 		velocity.z = move_toward(velocity.z, 0, SPEED)
 
 	move_and_slide()
+
+func _unhandled_input(event):
+	if event is InputEventMouseMotion:
+		rotate_y(-event.relative.x * 0.002)
+		$Camera3D.rotate_x(-event.relative.y * 0.002)
+		$Camera3D.rotation.x = clamp(
+			$Camera3D.rotation.x,
+			deg_to_rad(-80),
+			deg_to_rad(80)
+		)

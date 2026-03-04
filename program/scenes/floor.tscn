@@ -7,7 +7,9 @@
 [node name="StaticBody3D" type="StaticBody3D"]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(50, 0, 0, 0, 0.2, 0, 0, 0, 50, 0, 0, 0)
 shape = SubResource("BoxShape3D_me46e")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(50, 0, 0, 0, 0.2, 0, 0, 0, 50, 0, 0, 0)
 mesh = SubResource("BoxMesh_typc0")

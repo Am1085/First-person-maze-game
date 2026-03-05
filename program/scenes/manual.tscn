@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://dwbslrqs6ng77"]
+
+[ext_resource type="Script" uid="uid://pip18efjgeq0" path="res://scripts/MazeGenerator.gd" id="1_e3q0r"]
+[ext_resource type="Script" uid="uid://om7bh28qscnt" path="res://scripts/player.gd" id="2_pxtqk"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_0dj3i"]
+size = Vector2(180, 180)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_kijub"]
+size = Vector3(200, 1, 200)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xjatu"]
+
+[node name="main" type="Node3D" unique_id=1731598349]
+
+[node name="Maze" type="Node3D" parent="." unique_id=1101498784]
+script = ExtResource("1_e3q0r")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=134582277]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.240274, 4.6492023, 6.9617157)
+
+[node name="Floor" type="StaticBody3D" parent="." unique_id=1595332005]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor" unique_id=258275520]
+mesh = SubResource("PlaneMesh_0dj3i")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=2016820670]
+shape = SubResource("BoxShape3D_kijub")
+
+[node name="Player" type="CharacterBody3D" parent="." unique_id=874390544]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, 3)
+script = ExtResource("2_pxtqk")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player" unique_id=315005759]
+shape = SubResource("CapsuleShape3D_xjatu")
+
+[node name="Camera3D" type="Camera3D" parent="Player" unique_id=1633181225]

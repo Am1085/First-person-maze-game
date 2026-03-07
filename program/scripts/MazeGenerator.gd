@@ -33,7 +33,7 @@ var maze_grid = [
   [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,1,0,1],
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,0,1],
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-];
+]
 
 # Wall properties
 const WALL_SIZE = 3.0
@@ -74,7 +74,6 @@ func create_wall(row: int, col: int):
 	var wall_body = StaticBody3D.new()
 	
 	# Position: grid cell (i, j) -> 3D position (j * WALL_SIZE, WALL_HEIGHT/2, i * WALL_SIZE)
-	# Y position is WALL_HEIGHT/2 so the wall sits on the ground
 	var pos_x = col * WALL_SIZE
 	var pos_y = WALL_HEIGHT / 2.0
 	var pos_z = row * WALL_SIZE

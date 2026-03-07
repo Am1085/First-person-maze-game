@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://dwbslrqs6ng77"]
+[gd_scene load_steps=11 format=3 uid="uid://dwbslrqs6ng77"]
 
-[ext_resource type="Script" uid="uid://pip18efjgeq0" path="res://scripts/MazeGenerator.gd" id="1_e3q0r"]
-[ext_resource type="Script" uid="uid://om7bh28qscnt" path="res://scripts/player.gd" id="2_pxtqk"]
+[ext_resource type="Script" path="res://scripts/MazeGenerator.gd" id="1_e3q0r"]
+[ext_resource type="Script" path="res://scripts/player.gd" id="2_pxtqk"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_0dj3i"]
 size = Vector2(180, 180)
@@ -11,27 +11,111 @@ size = Vector3(200, 1, 200)
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xjatu"]
 
-[node name="main" type="Node3D" unique_id=1731598349]
+[sub_resource type="GDScript" id="GDScript_g4xdh"]
+script/source = "extends Area3D
 
-[node name="Maze" type="Node3D" parent="." unique_id=1101498784]
+func _on_body_entered(body):
+	if body.name == \"Player\":
+		var ui = get_tree().current_scene.get_node(\"UI/Winmessage\")
+		ui.visible = true
+"
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_avphh"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_smb6g"]
+emission_enabled = true
+emission = Color(0.596078, 0, 0, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_3wwnw"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dnl42"]
+
+[node name="main" type="Node3D"]
+
+[node name="Maze" type="Node3D" parent="."]
 script = ExtResource("1_e3q0r")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=134582277]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.240274, 4.6492023, 6.9617157)
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.2403, 4.6492, 6.96172)
+light_energy = 1.5
+shadow_enabled = true
 
-[node name="Floor" type="StaticBody3D" parent="." unique_id=1595332005]
+[node name="Floor" type="StaticBody3D" parent="."]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor" unique_id=258275520]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
 mesh = SubResource("PlaneMesh_0dj3i")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=2016820670]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
 shape = SubResource("BoxShape3D_kijub")
 
-[node name="Player" type="CharacterBody3D" parent="." unique_id=874390544]
+[node name="Player" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, 3)
 script = ExtResource("2_pxtqk")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Player" unique_id=315005759]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
 shape = SubResource("CapsuleShape3D_xjatu")
 
-[node name="Camera3D" type="Camera3D" parent="Player" unique_id=1633181225]
+[node name="Camera3D" type="Camera3D" parent="Player"]
+
+[node name="SpotLight3D" type="SpotLight3D" parent="Player/Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.2)
+light_color = Color(1, 0.247059, 1, 1)
+light_energy = 3.0
+shadow_enabled = true
+spot_range = 15.0
+spot_angle = 40.0
+
+[node name="Goal" type="Area3D" parent="."]
+script = SubResource("GDScript_g4xdh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Goal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84, 1, 84)
+shape = SubResource("CylinderShape3D_avphh")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Goal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84, 1, 84)
+material_override = SubResource("StandardMaterial3D_smb6g")
+mesh = SubResource("CylinderMesh_3wwnw")
+surface_material_override/0 = SubResource("StandardMaterial3D_dnl42")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="mimimapcontainer" type="SubViewportContainer" parent="CanvasLayer"]
+custom_minimum_size = Vector2(300, 300)
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -300.0
+offset_bottom = 300.0
+grow_horizontal = 0
+
+[node name="SubViewport" type="SubViewport" parent="CanvasLayer/mimimapcontainer"]
+handle_input_locally = false
+size = Vector2i(300, 300)
+render_target_update_mode = 4
+
+[node name="minimap" type="Camera3D" parent="CanvasLayer/mimimapcontainer/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 45, 120, 45)
+projection = 1
+size = 100.0
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Winmessage" type="Label" parent="UI"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -76.0
+offset_top = -13.0
+offset_right = 76.0
+offset_bottom = 13.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 60
+text = "MAZE COMPLETED!!"
+
+[connection signal="body_entered" from="Goal" to="Goal" method="_on_body_entered"]

@@ -15,6 +15,6 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="First-person-maze-game"
-run/main_scene="uid://dio0f36nxtbdb"
-config/features=PackedStringArray("4.6", "Forward Plus")
+run/main_scene="res://scenes/manual.tscn"
+config/features=PackedStringArray("4.0", "Forward Plus")
 config/icon="res://assets/icon.svg"

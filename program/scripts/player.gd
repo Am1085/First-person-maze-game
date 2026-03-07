@@ -8,7 +8,7 @@ const MOUSE_SENSITIVITY = 0.002
 
 # Get the gravity from project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
-
+@onready var footsteps = $Footsteps
 # --- Initialization ---
 func _ready():
 	# This hides the mouse and locks it to the center of the screen
@@ -40,7 +40,12 @@ func _physics_process(delta):
 		# Smoothly stop if no keys are pressed
 		velocity.x = move_toward(velocity.x, 0, ACCEL * delta)
 		velocity.z = move_toward(velocity.z, 0, ACCEL * delta)
-
+	# Footstep sound
+	if is_on_floor() and Vector2(velocity.x, velocity.z).length() > 0.1:
+		if not footsteps.playing:
+			footsteps.play()
+	else:
+		footsteps.stop() 
 	# 6. Built-in Godot function to handle collisions and movement
 	move_and_slide()
 
@@ -65,3 +70,4 @@ func _unhandled_input(event):
 	# ESC key to free the mouse (useful for debugging)
 	if Input.is_action_just_pressed("ui_cancel"):
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+   

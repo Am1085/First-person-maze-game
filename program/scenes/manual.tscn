@@ -1,7 +1,10 @@
-[gd_scene load_steps=11 format=3 uid="uid://dwbslrqs6ng77"]
+[gd_scene load_steps=18 format=3 uid="uid://dwbslrqs6ng77"]
 
 [ext_resource type="Script" path="res://scripts/MazeGenerator.gd" id="1_e3q0r"]
+[ext_resource type="Script" path="res://scenes/timer.gd" id="1_mkdsc"]
 [ext_resource type="Script" path="res://scripts/player.gd" id="2_pxtqk"]
+[ext_resource type="AudioStream" uid="uid://buvkj23w55cyt" path="res://music/footstep.mp3" id="4_musin"]
+[ext_resource type="AudioStream" uid="uid://byt6d5w344fs3" path="res://music/background_music.mp3" id="5_7g1y2"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_0dj3i"]
 size = Vector2(180, 180)
@@ -16,22 +19,49 @@ script/source = "extends Area3D
 
 func _on_body_entered(body):
 	if body.name == \"Player\":
-		var ui = get_tree().current_scene.get_node(\"UI/Winmessage\")
-		ui.visible = true
+		var scene = get_tree().current_scene
+		
+		# Show win message
+		scene.get_node(\"UI/Winmessage\").visible = true
+		
+		# Stop timer
+		scene.timer_running = false
+		
+		# Stop player movement
+		body.set_process(false)
+		body.set_physics_process(false)
+func _input(event):
+	if event.is_action_pressed(\"ui_accept\"):
+		get_tree().reload_current_scene()
 "
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_avphh"]
+[sub_resource type="SphereShape3D" id="SphereShape3D_lrwri"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_smb6g"]
 emission_enabled = true
-emission = Color(0.596078, 0, 0, 1)
-emission_energy_multiplier = 3.0
+emission = Color(0.596078, 0, 0.976471, 1)
+emission_energy_multiplier = 10.0
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_3wwnw"]
+[sub_resource type="SphereMesh" id="SphereMesh_xuty4"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dnl42"]
 
+[sub_resource type="Environment" id="Environment_04y3o"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_uq5jd"]
+
+[sub_resource type="Sky" id="Sky_vuwv1"]
+sky_material = SubResource("ProceduralSkyMaterial_uq5jd")
+
+[sub_resource type="Environment" id="Environment_bo0y8"]
+background_mode = 2
+sky = SubResource("Sky_vuwv1")
+fog_enabled = true
+fog_light_color = Color(0.941176, 0.890196, 0.835294, 1)
+fog_density = 0.02
+
 [node name="main" type="Node3D"]
+script = ExtResource("1_mkdsc")
 
 [node name="Maze" type="Node3D" parent="."]
 script = ExtResource("1_e3q0r")
@@ -60,23 +90,28 @@ shape = SubResource("CapsuleShape3D_xjatu")
 
 [node name="SpotLight3D" type="SpotLight3D" parent="Player/Camera3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.2)
-light_color = Color(1, 0.247059, 1, 1)
-light_energy = 3.0
+light_color = Color(0.282353, 0.85098, 0, 1)
+light_energy = 4.0
 shadow_enabled = true
-spot_range = 15.0
+spot_range = 20.0
 spot_angle = 40.0
+
+[node name="Footsteps" type="AudioStreamPlayer3D" parent="Player"]
+stream = ExtResource("4_musin")
+volume_db = -5.0
+pitch_scale = 1.1
 
 [node name="Goal" type="Area3D" parent="."]
 script = SubResource("GDScript_g4xdh")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Goal"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84, 1, 84)
-shape = SubResource("CylinderShape3D_avphh")
+shape = SubResource("SphereShape3D_lrwri")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Goal"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84, 1, 84)
 material_override = SubResource("StandardMaterial3D_smb6g")
-mesh = SubResource("CylinderMesh_3wwnw")
+mesh = SubResource("SphereMesh_xuty4")
 surface_material_override/0 = SubResource("StandardMaterial3D_dnl42")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
@@ -97,6 +132,7 @@ render_target_update_mode = 4
 
 [node name="minimap" type="Camera3D" parent="CanvasLayer/mimimapcontainer/SubViewport"]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 45, 120, 45)
+environment = SubResource("Environment_04y3o")
 projection = 1
 size = 100.0
 
@@ -115,7 +151,24 @@ offset_right = 76.0
 offset_bottom = 13.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_colors/font_color = Color(0.894118, 0.168627, 0.505882, 1)
 theme_override_font_sizes/font_size = 60
-text = "MAZE COMPLETED!!"
+text = " 🎉 MAZE COMPLETED 🎉
+
+...press enter to restart..."
+
+[node name="TimerLabel" type="Label" parent="UI"]
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_font_sizes/font_size = 30
+text = "Time in seconds: 0"
+
+[node name="Music" type="AudioStreamPlayer3D" parent="."]
+stream = ExtResource("5_7g1y2")
+volume_db = -10.0
+autoplay = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_bo0y8")
 
 [connection signal="body_entered" from="Goal" to="Goal" method="_on_body_entered"]

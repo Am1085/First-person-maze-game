@@ -397,3 +397,174 @@ owner: Shakshi
 draw a minimap on top right cornor of the game 
 which shows only when user asks for help by pressing "H" 
 use player dot for the positioning too
+
+
+
+
+
+
+STEP 10 — Game Timer
+
+Shows how long the player takes to finish the maze.
+
+1. Add Timer Label
+
+In your scene tree:
+
+Main
+└── UI
+    ├── Winmessage
+    └── TimerLabel
+
+Create Label → rename to TimerLabel
+
+Inspector:
+
+Text = Time: 0
+Layout → Top Left
+Font Size = 30
+2. Add Script to Main
+
+Attach a script to main node.
+
+extends Node3D
+
+var time_elapsed = 0.0
+@onready var timer_label = $UI/TimerLabel
+
+func _process(delta):
+	time_elapsed += delta
+	timer_label.text = "Time: " + str(int(time_elapsed))
+
+Now the timer counts during gameplay.
+
+STEP 11 — Stop Player When Maze Is Completed
+
+Open your Goal script and modify it.
+
+Goal (Area3D)
+
+Script:
+
+extends Area3D
+
+func _on_body_entered(body):
+	if body.name == "Player":
+		var label = get_tree().current_scene.get_node("UI/Winmessage")
+		label.visible = true
+		
+		body.set_physics_process(false)
+
+Result:
+
+Player reaches exit
+→ Message appears
+→ Player movement stops
+STEP 12 — Restart Game Button
+
+Update Winmessage text:
+
+🎉 MAZE COMPLETED 🎉
+Press R to Restart
+
+Add this inside main script:
+
+func _input(event):
+	if event.is_action_pressed("ui_accept"):
+		get_tree().reload_current_scene()
+
+Now pressing Enter restarts the maze.
+
+STEP 13 — Background Music
+
+Add node:
+
+Main
+└── Music (AudioStreamPlayer)
+
+Inspector:
+
+Stream → add music file
+Autoplay = ON
+Volume = -10
+
+Recommended sound: dark ambient maze music.
+
+STEP 14 — Footstep Sound
+
+Inside Player
+
+Player
+└── Footsteps (AudioStreamPlayer3D)
+
+Then in player.gd:
+
+if velocity.length() > 0:
+	if !$Footsteps.playing:
+		$Footsteps.play()
+
+Now the player makes walking sounds.
+
+STEP 15 — Add Sky Environment
+
+Add node:
+
+Main
+└── WorldEnvironment
+
+Inspector:
+
+Environment → New Environment
+Background → Sky
+Sky → New ProceduralSkyMaterial
+
+Now the maze has natural sky lighting.
+
+STEP 16 — Add Fog (Atmosphere)
+
+Inside Environment settings:
+
+Fog → Enabled
+Density → 0.02
+Color → Dark blue
+
+Now the maze feels mysterious and deeper.
+
+STEP 17 — Improve Flashlight
+
+Your flashlight color is currently pink.
+
+Change in SpotLight3D:
+
+Light Color = (1, 0.95, 0.8)
+Energy = 4
+Range = 20
+
+This looks like a real flashlight.
+
+STEP 18 — Better Win Message
+
+Select Winmessage
+
+Change:
+
+Text = 🎉 MAZE COMPLETED 🎉
+
+Add color:
+
+Font Color = Green
+Font Size = 70
+
+Center it.
+
+STEP 19 — Player Icon on Minimap
+
+Inside Player
+
+Add:
+
+Sprite3D
+
+Use a red circle texture.
+
+Now on the minimap you see your player position moving.

@@ -53,7 +53,6 @@ func setup_materials():
 	wall_material.albedo_color = Color(0.35, 0.35, 0.45, 1.0)
 	wall_material.metallic = 0.3
 	wall_material.roughness = 0.7
-	wall_material.specular = 0.5
 	
 	# Create wall mesh
 	wall_mesh = BoxMesh.new()

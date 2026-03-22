@@ -1,11 +1,10 @@
 [gd_scene format=3 uid="uid://dwbslrqs6ng77"]
 
-[ext_resource type="Script" uid="uid://dwgmmo33u3tru" path="res://scripts/timer.gd" id="1_4c15j"]
 [ext_resource type="Script" uid="uid://pip18efjgeq0" path="res://scripts/MazeGenerator.gd" id="1_e3q0r"]
+[ext_resource type="Script" uid="uid://bq5t4g21yyoyy" path="res://scenes/timer.gd" id="1_mkdsc"]
 [ext_resource type="Script" uid="uid://om7bh28qscnt" path="res://scripts/player.gd" id="2_pxtqk"]
 [ext_resource type="AudioStream" uid="uid://buvkj23w55cyt" path="res://music/footstep.mp3" id="4_musin"]
 [ext_resource type="Script" uid="uid://b4o82d1gj13yp" path="res://scripts/winscreen.gd" id="5_6fbm8"]
-[ext_resource type="AudioStream" uid="uid://byt6d5w344fs3" path="res://music/background_music.mp3" id="5_7g1y2"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_0dj3i"]
 size = Vector2(180, 180)
@@ -26,35 +25,52 @@ func _ready():
 	body_entered.connect(_on_body_entered)
 
 func _on_body_entered(body):
-	if body.name == \"Player\" and not game_finished:
-		game_finished = true
-		var scene = get_tree().current_scene
+	if body.name != \"Player\":
+		return
+	if game_finished:
+		return
+		
+	game_finished = true
+	print(\"PLAYER REACHED GOAL\")
 
+	# Step 1 - stop timer
+	var scene = get_tree().current_scene
+	if scene.has_method(\"get\") and \"timer_running\" in scene:
 		scene.timer_running = false
+	print(\"timer stopped\")
 
-		# Stop footsteps
-		var footsteps = body.get_node_or_null(\"Footsteps\")
-		if footsteps:
-			footsteps.stop()
-			footsteps.volume_db = -80.0
+	# Step 2 - stop footsteps
+	var footsteps = body.get_node_or_null(\"Footsteps\")
+	if footsteps:
+		footsteps.stop()
+		footsteps.volume_db = -80.0
+	print(\"footsteps stopped\")
 
-		# Stop background music
-		var music = scene.get_node_or_null(\"Music\")
-		if music:
-			music.stop()
-		else:
-			print(\"ERROR: Music node not found\")
-
-		body.velocity = Vector3.ZERO
+	# Step 3 - stop player
+	body.velocity = Vector3.ZERO
+	if \"game_over\" in body:
 		body.game_over = true
-		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	print(\"player stopped\")
 
-		var win_screen = scene.get_node_or_null(\"UI/WinScreen\")
-		if win_screen:
-			win_screen.show_win(scene.time_elapsed)
+	# Step 4 - free mouse
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	print(\"mouse freed\")
 
-		body.call_deferred(\"set_physics_process\", false)
-		body.call_deferred(\"set_process\", false)
+	# Step 5 - show win screen
+	var win_screen = scene.get_node_or_null(\"UI/WinScreen\")
+	print(\"WinScreen: \", win_screen)
+	if win_screen and win_screen.has_method(\"show_win\"):
+		var time = 0.0
+		if \"time_elapsed\" in scene:
+			time = scene.time_elapsed
+		print(\"calling show_win with time: \", time)
+		win_screen.show_win(time)
+	else:
+		print(\"ERROR: show_win method not found on WinScreen\")
+
+	# Step 6 - disable physics deferred
+	body.call_deferred(\"set_physics_process\", false)
+	body.call_deferred(\"set_process\", false)
 
 func _input(event):
 	if event.is_action_pressed(\"ui_accept\"):
@@ -87,7 +103,7 @@ fog_light_color = Color(0.941176, 0.890196, 0.835294, 1)
 fog_density = 0.02
 
 [node name="main" type="Node3D" unique_id=1473885084]
-script = ExtResource("1_4c15j")
+script = ExtResource("1_mkdsc")
 
 [node name="Maze" type="Node3D" parent="." unique_id=705531234]
 script = ExtResource("1_e3q0r")
@@ -106,7 +122,7 @@ mesh = SubResource("PlaneMesh_0dj3i")
 shape = SubResource("BoxShape3D_kijub")
 
 [node name="Player" type="CharacterBody3D" parent="." unique_id=1204535640]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, 3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84, 1.5, 75)
 script = ExtResource("2_pxtqk")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Player" unique_id=1768302381]
@@ -141,7 +157,18 @@ mesh = SubResource("SphereMesh_xuty4")
 surface_material_override/0 = SubResource("StandardMaterial3D_dnl42")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1029956951]
-layer = 10
+
+[node name="TimerLabel" type="Label" parent="UI" unique_id=653660786]
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_font_sizes/font_size = 30
+text = "Time in seconds: 0"
+
+[node name="PanelContainer" type="PanelContainer" parent="UI/TimerLabel" unique_id=303532483]
+clip_contents = true
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
 
 [node name="Minimap" type="SubViewportContainer" parent="UI" unique_id=1400538157]
 custom_minimum_size = Vector2(300, 300)
@@ -163,6 +190,10 @@ environment = SubResource("Environment_04y3o")
 projection = 1
 size = 100.0
 
+[node name="MinimapHint" type="Label" parent="UI/Minimap" unique_id=2140705878]
+layout_mode = 2
+text = "Press H for minimap help"
+
 [node name="WinScreen" type="Control" parent="UI" unique_id=1086391089]
 layout_mode = 3
 anchors_preset = 0
@@ -170,28 +201,12 @@ offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("5_6fbm8")
 
-[node name="MinimapHint" type="Label" parent="UI" unique_id=413769203]
-offset_left = 852.0
-offset_right = 892.0
-offset_bottom = 23.0
-
-[node name="TimerLabel" type="Label" parent="UI" unique_id=1671776330]
-offset_right = 40.0
-offset_bottom = 23.0
-
-[node name="Footsteps" type="AudioStreamPlayer3D" parent="." unique_id=1183012896]
+[node name="Music" type="AudioStreamPlayer3D" parent="." unique_id=1183012896]
 stream = ExtResource("4_musin")
-volume_db = -8.0
-unit_size = 9.28
-max_db = 3.87
+volume_db = -11.159
+autoplay = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2135886995]
 environment = SubResource("Environment_bo0y8")
 
-[node name="Music" type="AudioStreamPlayer" parent="." unique_id=1272993644]
-stream = ExtResource("5_7g1y2")
-volume_db = -26.638
-autoplay = true
-
-[node name="WinSound" type="AudioStreamPlayer3D" parent="." unique_id=944617605]
-volume_db = -8.435
+[connection signal="body_entered" from="Goal" to="Goal" method="_on_body_entered"]

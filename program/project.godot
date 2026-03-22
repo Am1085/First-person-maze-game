@@ -16,5 +16,11 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 config/name="First-person-maze-game"
 run/main_scene="res://scenes/manual.tscn"
-config/features=PackedStringArray("4.0", "Forward Plus")
+config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://assets/icon.svg"
+
+[file_customization]
+
+folder_colors={
+"res://fonts/": "red"
+}

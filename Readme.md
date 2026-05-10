@@ -41,12 +41,11 @@ To run this project, you will need the Godot Engine (v4.6 or later).
 
 | Action                      | Key              |
 | --------------------------- | ---------------- |
-| Movement                    | `W`, `A`, `S`, `D` |
+| Movement                    | `up`, `left`, `down`, `right` |
 | Look                        | `Mouse`          |
 | Toggle Minimap              | `H`              |
 | Release Mouse Cursor        | `Esc`            |
 | Restart Game (on win screen) | `Enter`          |
-
 ## Project Structure
 
 -   `program/scenes/manual.tscn`: The main scene that assembles all game components.
